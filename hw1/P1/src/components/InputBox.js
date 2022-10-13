@@ -52,7 +52,7 @@ function InputBox() {
                     if (!response.data || response.data.length === 0) {
                         message.error('Submit Fail');
                     }
-                    else{
+                    else {
                         message.success('Submit Succeed');
                     }
 
@@ -64,8 +64,10 @@ function InputBox() {
             })
     }
 
-    const ViewData = () => {
+    const ViewData = async() => {
         var name = document.getElementById("wiki-name");
+        let flag = 0;
+        let sum = 0;
         for (var i = 0; i < 5; i++) {
             var command = 'HGET user:' + name.value + ' git' + i;
             const opt = {
@@ -73,26 +75,31 @@ function InputBox() {
                 url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
                 headers: { 'content-type': 'application/json'}
             };
-
-            axios(opt)
+            let score;
+            await axios(opt)
                 .then( response => {
                     console.log('Request sent to Redis: ', opt)
-                    console.log(response.data)
+                    score = response.data.toLocaleString().slice(-2)
                     if(response.status === 200) {
-                        if (!response.data || response.data.length === 0) {
-                            message.error('View Request Fail');
+                        if (response.data && response.data.length !== 0) {
+                            flag++;
                         }
-                        else{
-                            message.success('View Request Succeed');
-                        }
-
                     }
-                    return response.data
                 })
                 .catch( error => {
                     console.log(error.message);
                     message.error('View Request Fail');
                 })
+            console.log(score)
+            document.getElementById("git" + i).value = score;
+            sum += parseInt(score);
+        }
+        if (flag == 5) {
+            message.success("View Request Succeed")
+            document.getElementById("sum").value = sum;
+        }
+        else {
+            message.error("View Request Fail")
         }
     }
 
@@ -124,7 +131,6 @@ function InputBox() {
                     defaultValue={0}
                     controls={false}
                     addonBefore="Git0"
-                    addonAfter=""
                     id="git0"
                     onChange={UpdateSum}
                     className="rank-table"
