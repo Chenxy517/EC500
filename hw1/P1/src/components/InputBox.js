@@ -8,6 +8,8 @@ import { PASSWORD } from '../constants';
 import { SALT } from '../constants';
 
 function InputBox() {
+    var md5 = new MD5(SALT + PASSWORD);
+    const hash = md5.md5;
 
     const UpdateSum = () => {
         var g0 = document.getElementById("git0");
@@ -27,11 +29,71 @@ function InputBox() {
     }
 
     const Submit = () => {
-        console.log("submit")
+        var name = document.getElementById("wiki-name");
+        var command = 'HMSET user:' + name.value;
+        for (var i = 0; i < 5; i++) {
+            var score = document.getElementById("git" + i).value;
+            console.log(score);
+            command += ' git' + i + ' ' + score;
+        }
+        console.log(command)
+
+        const opt = {
+            method: 'GET',
+            url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
+            headers: { 'content-type': 'application/json'}
+        };
+
+        axios(opt)
+            .then( response => {
+                console.log('Request sent to Redis: ', opt)
+                console.log(response.data)
+                if(response.status === 200) {
+                    if (!response.data || response.data.length === 0) {
+                        message.error('Submit Fail');
+                    }
+                    else{
+                        message.success('Submit Succeed');
+                    }
+
+                }
+            })
+            .catch( error => {
+                console.log(error.message);
+                message.error('Submit Fail');
+            })
     }
 
     const ViewData = () => {
-        console.log("view")
+        var name = document.getElementById("wiki-name");
+        for (var i = 0; i < 5; i++) {
+            var command = 'HGET user:' + name.value + ' git' + i;
+            const opt = {
+                method: 'GET',
+                url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
+                headers: { 'content-type': 'application/json'}
+            };
+
+            axios(opt)
+                .then( response => {
+                    console.log('Request sent to Redis: ', opt)
+                    console.log(response.data)
+                    if(response.status === 200) {
+                        if (!response.data || response.data.length === 0) {
+                            message.error('View Request Fail');
+                        }
+                        else{
+                            message.success('View Request Succeed');
+                        }
+
+                    }
+                    return response.data
+                })
+                .catch( error => {
+                    console.log(error.message);
+                    message.error('View Request Fail');
+                })
+        }
     }
 
     return (
@@ -40,6 +102,7 @@ function InputBox() {
                 <input
                     type="text"
                     placeholder="Input Wikiname"
+                    id="wiki-name"
                     className="wiki-name"
                 />
             </div>
@@ -61,6 +124,7 @@ function InputBox() {
                     defaultValue={0}
                     controls={false}
                     addonBefore="Git0"
+                    addonAfter=""
                     id="git0"
                     onChange={UpdateSum}
                     className="rank-table"
