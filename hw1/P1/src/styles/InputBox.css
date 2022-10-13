@@ -1,0 +1,21 @@
+.wiki-name {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.sum {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.rank-table {
+}
+
+.submit-btn {
+    margin-top: 20px;
+    width: 10%;
+}
+
+.view-btn {
+    margin-top: 20px;
+    width: 10%;
+}
+
