@@ -1,49 +1,61 @@
 import React from "react";
 import { Form, Input, message, InputNumber } from 'antd';
 import axios from 'axios';
-import PubSub from "pubsub-js"
 import MD5 from "./md5_lib"
 import { REDIS_URL } from "../constants";
 import { PASSWORD } from '../constants';
 import { SALT } from '../constants';
 
 function InputBox() {
+    //Generate hashcode with salt and password imported from constant.js
     var md5 = new MD5(SALT + PASSWORD);
     const hash = md5.md5;
 
+    //update sum of scores everytime number is changed
     const UpdateSum = () => {
-        var g0 = document.getElementById("git0");
-        var g1 = document.getElementById("git1");
-        var g2 = document.getElementById("git2");
-        var g3 = document.getElementById("git3");
-        var g4 = document.getElementById("git4");
-        var sum = parseInt(g0.value) + parseInt(g1.value) + parseInt(g2.value) + parseInt(g3.value) + parseInt(g4.value)
-        document.getElementById("sum").value = sum;
+        //get sum of scores
+        var sum = 0;
+        for (var i = 0; i < 5; i++) {
+            var score = document.getElementById("git" + i).value;
+            if (score == '') {
+                score = 0;
+            }
+            sum += parseInt(score);
+        }
+
+        //set submit-button availability
         var submitbtn = document.getElementById("submit-btn");
         if (sum > 100 || sum < 0) {
             submitbtn.disabled = true;
             message.error("Total score must be smaller than 100!")
+            document.getElementById("sum").value = "Check Score";
         } else {
             submitbtn.disabled = false;
+            document.getElementById("sum").value = sum;
         }
     }
 
+    //submit function
     const Submit = () => {
+        //generate message with scores and wiki-name
         var name = document.getElementById("wiki-name");
         var command = 'HMSET user:' + name.value;
         for (var i = 0; i < 5; i++) {
             var score = document.getElementById("git" + i).value;
+            if (score == '') {
+                score = 0;
+            }
             console.log(score);
             command += ' git' + i + ' ' + score;
         }
         console.log(command)
 
+        //interaction with redis backend
         const opt = {
             method: 'GET',
             url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
             headers: { 'content-type': 'application/json'}
         };
-
         axios(opt)
             .then( response => {
                 console.log('Request sent to Redis: ', opt)
@@ -64,8 +76,11 @@ function InputBox() {
             })
     }
 
+    //view data function
+    //use async..await structure to pass value out from axios
     const ViewData = async() => {
         var name = document.getElementById("wiki-name");
+        //add 1 to flag everytime data is returned successfully
         let flag = 0;
         let sum = 0;
         for (var i = 0; i < 5; i++) {
@@ -79,7 +94,7 @@ function InputBox() {
             await axios(opt)
                 .then( response => {
                     console.log('Request sent to Redis: ', opt)
-                    score = response.data.toLocaleString().slice(-2)
+                    score = response.data.toLocaleString().slice(43)
                     if(response.status === 200) {
                         if (response.data && response.data.length !== 0) {
                             flag++;
