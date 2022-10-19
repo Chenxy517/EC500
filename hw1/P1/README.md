@@ -4,7 +4,7 @@
 
 - Note: This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
 
-- Group Member: Xingyu Chen, Zhaozhong Qi
+- **Group Member:** `Xingyu Chen, Zhaozhong Qi`
 
 - In this project, we designed and depolyed a web interface of a client-side a ranked-auction system, similar to the PreHomeworkGroupAuction had as we used in the class.
 
