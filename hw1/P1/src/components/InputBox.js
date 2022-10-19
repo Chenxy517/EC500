@@ -93,6 +93,10 @@ function InputBox() {
 
     };
 
+    const Logout = () => {
+        verify_status = false;
+        message.info("Logged Out!");
+    }
 
     const Submit = async() => {
         
@@ -147,8 +151,11 @@ function InputBox() {
                     })
             }
         } 
+        else if (!verify_status) {
+            message.error("Unauthorized!");
+        }
         else {
-            message.error("Invalid Password OR Total Score Is Invalid");
+            message.error("Invalid Total Score!");
         }
     };
 
@@ -206,9 +213,9 @@ function InputBox() {
 
         }
         else {
-            message.error("Invalid Password OR Total Score Is Invalid");
+            message.error("Unauthorized!");
         }
-       
+
     }
     
     return (
@@ -226,7 +233,7 @@ function InputBox() {
                         message: 'Please input your password',
                     },
                 ]}/>
-            </div>          
+            </div>
 
             <div>
                 <button
@@ -236,18 +243,31 @@ function InputBox() {
                     Verify
                 </button>
             </div>
+
             <div>
-                <h1>Auction Rank: </h1>
+                <button
+                    onClick={Logout}
+                    id="logout-btn"
+                    className="logout-btn">
+                    Logout
+                </button>
+            </div>
+
+            <div>
+                <h1 className="rank-title">
+                    Auction Rank:
+                </h1>
             </div>
 
             <div>
                 <input
                     type="text"
-                    placeholder="Enter Auction's name"
+                    placeholder="Enter Wikiname"
                     id="wiki-name"
                     className="wiki-name"
                 />
             </div>
+
             <div>
                 <InputNumber
                     defaultValue={0}
@@ -257,6 +277,7 @@ function InputBox() {
                     className="sum"
                 />
             </div>
+
             <div>
                 <InputNumber
                     min={0}
@@ -269,6 +290,7 @@ function InputBox() {
                     className="rank-table"
                 />
             </div>
+
             <div>
                 <InputNumber
                     min={0}
@@ -281,6 +303,7 @@ function InputBox() {
                     className="rank-table"
                 />
             </div>
+
             <div>
                 <InputNumber
                     min={0}
@@ -294,6 +317,7 @@ function InputBox() {
                     label="123"
                 />
             </div>
+
             <div>
                 <InputNumber
                     min={0}
@@ -306,6 +330,7 @@ function InputBox() {
                     className="rank-table"
                 />
             </div>
+
             <div>
                 <InputNumber
                     min={0}
@@ -318,6 +343,7 @@ function InputBox() {
                     className="rank-table"
                 />
             </div>
+
             <div>
                 <button
                     onClick={Submit}
@@ -326,6 +352,7 @@ function InputBox() {
                     Submit
                 </button>
             </div>
+
             <div>
                 <button
                     onClick={ViewData}

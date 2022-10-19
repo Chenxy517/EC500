@@ -15,11 +15,22 @@
     background-color: rgba(255, 0, 0, 0.5);
 }
 
-.rank-table {
+.rank-title {
+    margin-top: 50px;
 }
 
 .pass-word {
     width: 300px;
+}
+
+.verify-btn {
+    margin-top: 20px;
+    width: 10%;
+}
+
+.logout-btn {
+    margin-top: 20px;
+    width: 10%;
 }
 
 .submit-btn {
