@@ -15,6 +15,16 @@
     background-color: rgba(255, 0, 0, 0.5);
 }
 
+.authorized-message {
+    font-size: medium;
+    color: green;
+}
+
+.unauthorized-message {
+    font-size: medium;
+    color: red;
+}
+
 .rank-title {
     margin-top: 50px;
 }

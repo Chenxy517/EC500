@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import { Input, message, InputNumber } from 'antd';
 import axios from 'axios';
 import MD5 from "./md5_lib"
@@ -12,11 +12,10 @@ function InputBox() {
      * When verify_status is: FALSE, 
      * and disable the Submit and View of the Action Rank;
      */ 
-    var verify_status;
+    const [verify_status, setVerifyStatus] = useState(false);
     var sum_status;
-    var func = function() {       
-        
-        verify_status = false;
+    var func = function() {
+
         sum_status = false;
         console.log("Verify status initialized as:", verify_status);
         console.log("Sum status initialized as:", sum_status);
@@ -56,7 +55,7 @@ function InputBox() {
         }
     }
     
-    // Verify that if the user has the authenticate to view and edit the Auction Rank;
+    // Verify that if the user has the authentication to view and edit the Auction Rank;
     const Verify = async() => {
 
         const password = document.getElementById("password").value;
@@ -78,12 +77,12 @@ function InputBox() {
                     
                     if (!response.data || response.data.length === 0) {
                         message.error('Password Incorrect');
-                        verify_status = false;
+                        setVerifyStatus(false);
                     }
                     else {
-                        message.success('Verify succeseed, Now you could edit your table!');
+                        message.success('Verify succeed!');
                         localStorage.setItem("hash_pass", hash_verify);
-                        verify_status = true;
+                        setVerifyStatus(true);
                     }
                 }
             })
@@ -94,15 +93,15 @@ function InputBox() {
     };
 
     const Logout = () => {
-        verify_status = false;
+        setVerifyStatus(false);
         message.info("Logged Out!");
     }
 
-    const Submit = async() => {
+    const Submit = () => {
         
         console.log("Sum status:", sum_status);
 
-        if (verify_status === true && sum_status === true) {
+        if (sum_status === true) {
 
             var name = document.getElementById("wiki-name");
             const hash = localStorage.getItem("hash_pass");
@@ -131,31 +130,27 @@ function InputBox() {
                     headers: { 'content-type': 'application/json'}
                 };
                 
-                await axios(opt)
+                axios(opt)
                     .then( response => {
                         console.log('Request sent to Redis: ', opt)
                         console.log(response.data)
                         if(response.status === 200) {
                             if (!response.data || response.data.length === 0) {
-                                message.error('Submit Fail');
+                                message.error('Submit Fail!');
                             }
                             else {
-                                message.success('Submit Succeed');
+                                message.success('Submit Succeed!');
                             }
 
                         }
                     })
                     .catch( error => {
                         console.log(error.message);
-                        message.error('Submit Fail');
+                        message.error('Submit Fail!');
                     })
             }
-        } 
-        else if (!verify_status) {
-            message.error("Unauthorized!");
-        }
-        else {
-            message.error("Invalid Total Score!");
+        } else {
+            message.error("Total Score must be 100!");
         }
     };
 
@@ -163,59 +158,51 @@ function InputBox() {
     // Use async..await structure to enable passing the value out from axios.
     const ViewData = async() => {
 
-        if (verify_status === true) {
+        var name = document.getElementById("wiki-name");
 
-            var name = document.getElementById("wiki-name");
-            
-            const hash = localStorage.getItem("hash_pass");
+        const hash = localStorage.getItem("hash_pass");
 
-            if (name.value === '') {
-                message.error("Name must not be empty!");
-            } else {
-                // Add 1 to flag everytime data is returned successfully
-                let flag = 0;
-                let sum = 0;
-                
-                for (var i = 0; i < 5; i++) {
-                    var command = 'HGET user:' + name.value + ' git' + i;
-                    const opt = {
-                        method: 'GET',
-                        url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
-                        headers: { 'content-type': 'application/json'}
-                    };
-                    let score;
-                    await axios(opt)
-                        .then( response => {
-                            console.log('Request sent to Redis: ', opt)
-                            score = response.data.toLocaleString().slice(43)
-                            if(response.status === 200) {
-                                if (response.data && response.data.length !== 0) {
-                                    flag++;
-                                }
+        if (name.value === '') {
+            message.error("Name must not be empty!");
+        } else {
+            // Add 1 to flag everytime data is returned successfully
+            let flag = 0;
+            let sum = 0;
+
+            for (var i = 0; i < 5; i++) {
+                var command = 'HGET user:' + name.value + ' git' + i;
+                const opt = {
+                    method: 'GET',
+                    url: REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=' + command,
+                    headers: { 'content-type': 'application/json'}
+                };
+                let score;
+                await axios(opt)
+                    .then( response => {
+                        console.log('Request sent to Redis: ', opt)
+                        score = response.data.toLocaleString().slice(43)
+                        if(response.status === 200) {
+                            if (response.data && response.data.length !== 0) {
+                                flag++;
                             }
-                        })
-                        .catch( error => {
-                            console.log(error.message);
-                            message.error('View Request Fail');
-                        })
-                    console.log(score)
-                    document.getElementById("git" + i).value = score;
-                    sum += parseInt(score);
-                }
-                if (flag === 5) {
-                    message.success("View Request Succeed")
-                    document.getElementById("sum").value = sum;
-                }
-                else {
-                    message.error("View Request Fail")
-                }
+                        }
+                    })
+                    .catch( error => {
+                        console.log(error.message);
+                        message.error('View Request Fail');
+                    })
+                console.log(score)
+                document.getElementById("git" + i).value = score;
+                sum += parseInt(score);
             }
-
+            if (flag === 5) {
+                message.success("View Request Succeed")
+                document.getElementById("sum").value = sum;
+            }
+            else {
+                message.error("View Request Fail")
+            }
         }
-        else {
-            message.error("Unauthorized!");
-        }
-
     }
     
     return (
@@ -235,23 +222,40 @@ function InputBox() {
                 ]}/>
             </div>
 
-            <div>
-                <button
-                    onClick={Verify}
-                    id="verity-btn"
-                    className="verify-btn">
-                    Verify
-                </button>
-            </div>
+            {
+                verify_status ?
+                    null
+                    :
+                    <button
+                        onClick={Verify}
+                        id="verity-btn"
+                        className="verify-btn">
+                        Verify
+                    </button>
+            }
 
-            <div>
-                <button
-                    onClick={Logout}
-                    id="logout-btn"
-                    className="logout-btn">
-                    Logout
-                </button>
-            </div>
+            {
+                verify_status ?
+                    <button
+                        onClick={Logout}
+                        id="logout-btn"
+                        className="logout-btn">
+                        Logout
+                    </button>
+                    :
+                    null
+            }
+
+            {
+                verify_status ?
+                    <h1 className="authorized-message">
+                        Authorized!
+                    </h1>
+                    :
+                    <h1 className="unauthorized-message">
+                        Unauthorized!
+                    </h1>
+            }
 
             <div>
                 <h1 className="rank-title">
@@ -347,6 +351,7 @@ function InputBox() {
             <div>
                 <button
                     onClick={Submit}
+                    disabled={verify_status ? false : true}
                     id="submit-btn"
                     className="submit-btn">
                     Submit
@@ -356,6 +361,7 @@ function InputBox() {
             <div>
                 <button
                     onClick={ViewData}
+                    disabled={verify_status ? false : true}
                     id="view-btn"
                     className="view-btn">
                     View
