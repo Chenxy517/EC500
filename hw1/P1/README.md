@@ -4,6 +4,8 @@
 
 - Note: This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
 
+- Group Member: Xingyu Chen, Zhaozhong Qi
+
 - In this project, we designed and depolyed a web interface of a client-side a ranked-auction system, similar to the PreHomeworkGroupAuction had as we used in the class.
 
 This APP interface integrated with React component. (For more information about React, check the section of `#Learn More`). React is a JavaScript library for building user interfaces, we use the architecture to build the primer User-Interface that could interact with Redis server by using only pure HTML, CSS, JavaScript language.
