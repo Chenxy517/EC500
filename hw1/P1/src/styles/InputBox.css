@@ -1,5 +1,12 @@
+.user-authenticate {
+    width: 500px;
+    margin: auto;
+    margin-top: 50px;
+    padding-right: 125px;
+}
+
 .wiki-name {
-    width: 237px;
+    width: 233px;
     background-color: rgba(255, 0, 0, 0.5);
     text-align: center;
 }
@@ -9,6 +16,10 @@
 }
 
 .rank-table {
+}
+
+.pass-word {
+    width: 300px;
 }
 
 .submit-btn {
