@@ -22,7 +22,7 @@ The mechanism of the webpage has the Five main attributes as the following as sh
 
 
  - The Interface Preview: 
-![Interface Preview](/assets/images/Preview.png)
+![Interface Preview](src/assets/images/Preview.png)
 
 --- 
 
