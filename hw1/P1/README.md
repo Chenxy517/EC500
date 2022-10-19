@@ -1,20 +1,28 @@
-# EC501_HW1 Redis adapter
+# EC501_HW1 Ranked auction
 
 ## Introduction:
 
 - Note: This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). 
 
-- In this project, we designed a web interface that integrated by React component. (For more information about React, check the section of `#Learn More`). React is a JavaScript library for building user interfaces, we use the architecture to build the primer User-Interface that could interact with Redis server by using only pure HTML, CSS, JavaScript language.
+- In this project, we designed and depolyed a web interface of a client-side a ranked-auction system, similar to the PreHomeworkGroupAuction had as we used in the class.
+
+This APP interface integrated with React component. (For more information about React, check the section of `#Learn More`). React is a JavaScript library for building user interfaces, we use the architecture to build the primer User-Interface that could interact with Redis server by using only pure HTML, CSS, JavaScript language.
 
 - As in mention, we also applied an MD5 hash function by using the JavaScript library which could be sourced from: [npm MD5](https://www.npmjs.com/package/md5). 
 
 - Before you running with the code and build the project, there are several steps needed of environment Set-up. Check the following section `#Environment SetUp` to learn about what needed to be installed.
 
-The webpage includes three major Input block,
+The mechanism of the webpage has the Five main attributes as the following as shown: 
 
-1. A `salt` , which is a sequence of characters.
-2. A `hash` , which should contain the `md5` hash of (Your salt concatenated with an appropriate password, default has been included in the placeholder of the block).
-3. A `message` , which is the command that you'd like to send to the server.
+1. It enable choices to be ranked; In other words, **you must specify the rank for EACH student**, by any rank that you want.
+2. The range of valid ranks for each choice ( e.g., integers 0..99, inclusive on the PreHomeworkGroupAuction).
+3. The net sum of ranks allotted to a given user (e.g., 100 on the PreHomeworkGroupAuction, neither allowed SMALLER or LARGER).
+4. The wikiname of a student in the class with which to associate the ranking. In other words, you must specify your name, the one(author) who has edited the table.
+5. Mechanism for viewing and/or modifying the ranks that have been submitted by any user(You).
+
+
+ - The Interface Preview: 
+![Interface Preview](/assets/images/Preview.png)
 
 --- 
 
@@ -29,6 +37,10 @@ The webpage includes three major Input block,
 ### **React:**  
 - #### Terminal command: `npm i react`
 > As we explained above, `React` is a JavaScript library for creating user interfaces and will be necessary for this project.
+
+### **Antd:**  
+- #### Terminal command: `npm install antd`
+> A React UI library antd that contains a set of high quality components and demos for building rich, interactive user interfaces.
 
 ### **Axios:**  
 - #### Terminal command: `npm install axios`
