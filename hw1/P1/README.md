@@ -12,12 +12,13 @@ This APP interface integrated with React component. (For more information about 
 
 - Before you running with the code and build the project, there are several steps needed of environment Set-up. Check the following section `#Environment SetUp` to learn about what needed to be installed.
 
-The mechanism of the webpage has the Five main attributes as the following as shown: 
+
+### The mechanism of the webpage has the Five main attributes as the following as shown: 
 
 1. It enable choices to be ranked; In other words, **you must specify the rank for EACH student**, by any rank that you want.
-2. The range of valid ranks for each choice ( e.g., integers 0..99, inclusive on the PreHomeworkGroupAuction).
+2. The range of valid ranks for each choice ( e.g., integers `0..99`, inclusive on the PreHomeworkGroupAuction).
 3. The net sum of ranks allotted to a given user (e.g., 100 on the PreHomeworkGroupAuction, neither allowed SMALLER or LARGER).
-4. The wikiname of a student in the class with which to associate the ranking. In other words, you must specify your name, the one(author) who has edited the table.
+4. The wikiname of a student in the class with which to associate the ranking. In other words, you must specify your name, the one(Author) who has edited the table.
 5. Mechanism for viewing and/or modifying the ranks that have been submitted by any user(You).
 
 
