@@ -1,17 +1,24 @@
-import { Form, InputNumber, Pagination, Table, Typography } from 'antd';
+import { Form, InputNumber, Table, Typography, message } from 'antd';
 import React, { useState } from 'react';
+import axios from 'axios';
+import MD5 from "./md5_lib"
+import { REDIS_URL, SALT, PASSWORD } from "../constants";
 
 function InputTable (props) {
     const { user_num, max_rank, max_sum } = props;
 
     const originData = [];
     for (let i = 0; i < user_num; i++) {
-        var obj = {key: i.toString()}
+        var obj = {
+            key: i.toString(),
+            user: 'Git' + i
+        }
         for (let j = 0; j < user_num; j++) {
             obj['git' + j] = 0;
         }
         originData.push(obj);
     }
+    console.log(originData)
 
     const EditableCell = ({
                               editing,
@@ -42,6 +49,7 @@ function InputTable (props) {
                         <InputNumber
                             min={0}
                             max={max_rank}
+                            size="small"
                         />
                     </Form.Item>
                 ) : (
@@ -54,7 +62,6 @@ function InputTable (props) {
     const [form] = Form.useForm();
     const [data, setData] = useState(originData);
     const [editingKey, setEditingKey] = useState('');
-    const [sumValid, setSumValid] = useState(0);
     const isEditing = (record) => record.key === editingKey;
 
     const edit = (record) => {
@@ -85,6 +92,16 @@ function InputTable (props) {
                 setData(newData);
                 setEditingKey('');
             }
+            let row_sum = 0;
+            for (let g = 0; g < user_num; g++) {
+                row_sum += newData[index]["git" + g];
+            }
+            console.log("row_sum=", row_sum)
+            if (row_sum === max_sum) {
+                message.success("Score saved succeed!");
+            } else {
+                message.warn("Row sum must be " + max_sum + "!");
+            }
         } catch (errInfo) {
             console.log('Validate Failed:', errInfo);
         }
@@ -92,14 +109,15 @@ function InputTable (props) {
 
     const columns = [];
     columns.push( {
-        title: 'Users',
-        dataIndex: 'users',
+        title: 'User',
+        dataIndex: 'user',
         width: '3%',
-        render: (index) => {
-            return (
-                <h>Git{index}</h>
-            )
-        }
+        fixed: 'left'
+        // render: (index) => {
+        //     return (
+        //         <h>Git{index}</h>
+        //     )
+        // }
     })
 
     for (let i = 0; i < user_num; i++) {
@@ -114,6 +132,7 @@ function InputTable (props) {
     columns.push({
         title: 'Operation',
         dataIndex: 'operation',
+        fixed: 'right',
         render: (_, record) => {
             const editable = isEditing(record);
             return editable ? (
@@ -123,6 +142,7 @@ function InputTable (props) {
                         style={{
                             marginRight: 8,
                         }}
+                        className="save-link"
                     >
                         Save
                     </Typography.Link>
@@ -141,7 +161,7 @@ function InputTable (props) {
 
     const mergeColumns = columns.map((col) => {
         if (col.title === 'Users') {
-
+            return col;
         }
         if (!col.editable) {
             return col;
@@ -158,6 +178,46 @@ function InputTable (props) {
         };
     });
 
+    const submit = async () => {
+        const new_md5 = new MD5(SALT + PASSWORD);
+        const hash = new_md5.md5;
+        let submitFlag = 0;
+        for (let index = 0; index < user_num; index++) {
+            let url = REDIS_URL + '?salt=' + SALT + '&hash=' + hash + '&message=HMSET user:git' + index;
+            for (let i = 0; i < user_num; i++) {
+                const score = data[index]["git" + i];
+                url += ' git' + i + ' ' + score + ' ';
+            }
+            const opt = {
+                method: 'GET',
+                url: url,
+                headers: { 'content-type': 'application/json'}
+            };
+            await axios(opt)
+                .then( response => {
+                    console.log('Request sent to Redis: ', opt)
+                    console.log(response.data)
+                    if(response.status === 200) {
+                        if (!response.data || response.data.length === 0) {
+                            message.error('Submit Fail!');
+                        }
+                        else {
+                            submitFlag++;
+                        }
+
+                    }
+                })
+                .catch( error => {
+                    console.log(error.message);
+                    message.error('Submit Fail!');
+                })
+        }
+        console.log(submitFlag);
+        if (submitFlag === user_num) {
+            message.success('Submit Succeed!')
+        }
+    }
+
     return (
         <div>
             <div>
@@ -168,10 +228,11 @@ function InputTable (props) {
                     <Table
                         components={{
                             body: {
-                                cell: EditableCell,
-                            },
+                                cell: EditableCell
+                            }
                         }}
                         bordered
+                        size="small"
                         dataSource={data}
                         columns={mergeColumns}
                         rowClassName="editable-row"
@@ -180,7 +241,7 @@ function InputTable (props) {
             </div>
             <div>
                 <button
-                    // onClick={}
+                    onClick={submit}
                     disabled={false}
                     id="submit-btn"
                     className="submit-btn">
