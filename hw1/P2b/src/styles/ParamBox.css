@@ -1,0 +1,10 @@
+.param-box {
+    margin-top: 100px;
+}
+
+.input-boxes {
+    display: list-item;
+    width: 175px;
+    position: relative;
+    text-align: center;
+}

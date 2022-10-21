@@ -12,7 +12,6 @@ function InputTable (props) {
         }
         originData.push(obj);
     }
-    console.log(originData);
 
     const EditableCell = ({
                               editing,
@@ -141,6 +140,9 @@ function InputTable (props) {
 
 
     const mergeColumns = columns.map((col) => {
+        if (col.title === 'Users') {
+
+        }
         if (!col.editable) {
             return col;
         }

@@ -4,6 +4,7 @@
 @import "./styles/Main.css";
 @import "./styles/Footer.css";
 @import "./styles/Table.css";
+@import "./styles/ParamBox.css";
 
 body {
   margin: 0;
