@@ -55,12 +55,67 @@ class GroupMatch{
     }
 
 
-    get match_group()
+    remove(element, array)
     {
-        for(var i=0; i < this.table.length; i++){
-            
+        // Remove specific element from an array:
+        for(let i = 0; i < array.length; i++){ 
+            if (array[i] === element) { 
+                array.splice(i, 1); 
+            }
         }
+        return array;
+    }
+
+    get match_group()
+    {   
+        // User has not been assigned for a specific group.
+        var unmatched = [...Array(this.table.length).keys()];
+        // Given a random USER, and pair the group members for this USER
+        var user = Math.floor(Math.random() * this.table.length);
+
+        var initial = true;
+
+        do 
+        {   // Define A Group for this USER:
+            var user_group = new Array();
+
+            if (initial) // Initialize, select the group for a random User:
+            {   
+                user_group.push(user);
+                unmatched = this.remove(user, unmatched);
+                this.get_member(user, user_group, unmatched);
+                initial = false;
+            }
+            else // Select the group for the residual USER only, which is grouped by nobody else.
+            {   
+                user = unmatched[0];
+                user_group.push(user);
+                unmatched = this.remove(user, unmatched);
+                this.get_member(user, user_group, unmatched);
+            }
+                
+        }
+        // If there is still USER not matched with any group, or he is the only one GUY that has been not selected by anybody else.
+        while(unmatched.length > 1)
+       
         return this.#_groupOfMatch;
+    }
+
+
+    get_member(current_user, current_user_group, unmatched_user)
+    {   
+        // Keep looking for teammates for the current user, until reach the maximum size of the group.
+        while (current_user_group.length < this.group_number) {
+            // The best approached User(index) of the current user', given by the local MAXIMUM score of the user provided.
+            var best_user = this.table[current_user].indexOf(Math.max(...this.table[current_user]), 0);
+            current_user_group.push(best_user);
+            unmatched_user = this.remove(best_user, unmatched_user);
+            
+            // For simple match a group member only by using Greedy, no tricky.
+            current_user = best_user;
+        }
+
+        this.#_groupOfMatch.push(current_user_group);
     }
 
     get total_score()
