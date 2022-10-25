@@ -48,13 +48,22 @@ function Grouping (props) {
     }
 
     return (
-        <button
-            onClick={groupUp}
-            className="param-btn">
-            Grouping
-        </button>
-    )
-    ;
+        <div className="group-area">
+            <div>
+                <button
+                    onClick={groupUp}
+                    className="group-btn">
+                    Grouping
+                </button>
+            </div>
+            <div className="return-box">
+                Grouping Result:
+                <div className="return-message">
+                    result
+                </div>
+            </div>
+        </div>   
+    );
 };
 
 export default Grouping;
