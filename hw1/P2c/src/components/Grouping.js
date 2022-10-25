@@ -44,7 +44,7 @@ function Grouping (props) {
 
             }
         }
-        console.log(data);
+        console.log('The data is' +　data[0]['git1']);
     }
 
     return (
