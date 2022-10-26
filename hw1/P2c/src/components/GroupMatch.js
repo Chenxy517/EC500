@@ -133,7 +133,7 @@ class GroupMatch{
         var all_group = chooseMember(unmatched_member, this.group_number);
 
         // Intitailize, Go through and Select the group which has the maximum SUM (Best score)
-        var group_score = 0;
+        var group_score = -1;
 
         var best_group = [];
         for (var i=0; i < all_group.length; i++)
@@ -145,6 +145,7 @@ class GroupMatch{
                 // Update the current score
                 best_group = all_group[i];
             }
+
         }
         // Push the current best matched group into the global combination for showing later.
         this.#_best_match.push(best_group);

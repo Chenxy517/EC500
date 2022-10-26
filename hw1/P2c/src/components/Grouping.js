@@ -45,7 +45,8 @@ function Grouping (props) {
 
             }
         }
-
+        console.log(data);
+        console.log("grouping start");
         const group_match = new GroupMatch(data, member_num);
         const best_match = group_match.best_match;
         console.log(best_match);
