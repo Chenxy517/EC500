@@ -2,6 +2,7 @@ import { message } from 'antd';
 import React, { useState } from 'react';
 import axios from 'axios';
 import MD5 from "./md5_lib"
+import GroupMatch from './GroupMatch';
 import { REDIS_URL, SALT, PASSWORD } from "../constants";
 
 function Grouping (props) {
@@ -44,7 +45,21 @@ function Grouping (props) {
 
             }
         }
-        console.log('The data is' +　data[0]['git1']);
+
+        const group_match = new GroupMatch(data, member_num);
+        const best_match = group_match.best_match;
+        console.log(best_match);
+
+        let display = "";
+        for (let i = 0; i < best_match.length; i++) {
+            display += '<br/>Group' + i + ': ';
+            for (let j = 0; j < best_match[i].length; j++) {
+                console.log(best_match[i][j]);
+                display += 'Git' + best_match[i][j] + '.  ';
+            }
+        };
+        console.log(display);
+        document.getElementById("display").innerHTML = display;
     }
 
     return (
@@ -58,8 +73,9 @@ function Grouping (props) {
             </div>
             <div className="return-box">
                 Grouping Result:
-                <div className="return-message">
-                    result
+                <div 
+                    id="display"
+                    className="display">
                 </div>
             </div>
         </div>   

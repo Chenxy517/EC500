@@ -1,30 +1,9 @@
-/**
- * A generalization of {@link MD5} to any of the standard Group Matching method.
- * This class represents a MD5(input) base class, that will encrypt the content by the MD5 message-digest algorithm.
- * For example, MD5("your_content") should be equivalent to the MD5 class, and it is the only way to initialize it.
- * 
- * Note!!: Need install npm package, using "npm install md5" 
- * @param parameter The input of the content who needs to be encrypted.
- * @var _encrypt(#) The private unencrptied content that is only accessible by inside of the class.
- */
-
-
-// For Test algorithm only: 
-const data = [
-    [0 , 50, 50, 0 , 0 ],
-    [50, 0 , 0 , 25, 25],
-    [50, 25, 0 , 5 , 20],
-    [25, 25, 25, 0 , 25],
-    [0 , 0 , 0 , 100,0 ],
-];
-const group_size = 3;
-
 class GroupMatch{
 
     // Privates should start with #. They are only accessible from inside the class.
     #_groupOfMatch = [[]];
     #_totalScore = 0;
-    #_best_match = [[]];
+    #_best_match = [];
  
     // Initialize the constructor, include setter:
     constructor(score_table, group_num)
@@ -40,10 +19,9 @@ class GroupMatch{
             if (group_num < 2){
                 throw "Group size cannot smaller than 2";
             }
-            if (group_num >= score_table.length){
+            if (group_num > score_table.length){
                 throw "Invalid Group size, Please try again.";
-            }
-            
+            }          
         }
         catch(err) {
             // DEBUG:
@@ -51,9 +29,7 @@ class GroupMatch{
             // window.Error(err);
         }
 
-
     }
-
 
     remove(element, array)
     {
@@ -101,7 +77,6 @@ class GroupMatch{
         return this.#_groupOfMatch;
     }
 
-
     get_member(current_user, current_user_group, unmatched_user)
     {   
         // Keep looking for teammates for the current user, until reach the maximum size of the group.
@@ -109,6 +84,7 @@ class GroupMatch{
             // The best approached User(index) of the current user', given by the local MAXIMUM score of the user provided.
             var best_user = this.table[current_user].indexOf(Math.max(...this.table[current_user]), 0);
             current_user_group.push(best_user);
+        
             unmatched_user = this.remove(best_user, unmatched_user);
             
             // For simple match a group member only by using Greedy, no tricky.
@@ -123,18 +99,119 @@ class GroupMatch{
         return this.#_totalScore;
     }
 
+
     get best_match()
     {
+        // User has not been assigned for a specific group.
+        // Initialized as all members are not matched.
+        var unmatched = [...Array(this.table.length).keys()];
+        do
+        {
+            unmatched = this.make_group(this.table, unmatched);
+        }
+        while(unmatched.length > this.group_number);
+
+        // Else: 
+        // the numbers of the residual member in the unmatched, 
+        // which is lesser than the group_size, We force make them a team.
+
+        this.#_best_match.push(unmatched);
 
         return this.#_best_match;
     }
+
+    /**
+     * Using Greedy Algorithm to choose the best group of under the current combination.
+     * The function will store the temporary result into the record of global combination,
+     * and @returns: the residual members which has not matched.
+     * @param current_table: 
+     * @param unmatched_member: 
+     */
+    make_group(current_table, unmatched_member)
+    {
+      
+        var all_group = chooseMember(unmatched_member, this.group_number);
+
+        // Intitailize, Go through and Select the group which has the maximum SUM (Best score)
+        var group_score = 0;
+
+        var best_group = [];
+        for (var i=0; i < all_group.length; i++)
+        {   
+            var current_score = this.get_score(all_group[i], current_table)
+            if( group_score < current_score)
+            {
+                group_score = current_score;
+                // Update the current score
+                best_group = all_group[i];
+            }
+        }
+        // Push the current best matched group into the global combination for showing later.
+        this.#_best_match.push(best_group);
+        // 
+        for (var j=0; j < best_group.length; j++)
+        {
+            unmatched_member = this.remove(best_group[j], unmatched_member);
+        }
+
+        return unmatched_member;
+    }
+    
+    // Given a group includes some members, find the total_rank(score) of this group
+    get_score(group, datasheet)
+    {   
+        var _total_score = 0;
+        for (let i=0; i < group.length; i++)
+        {   
+            var member_score = 0;
+            var this_member = group[i];
+            for (let j=0; j < group.length; j++)
+            {   
+                if (group[j] != this_member)
+                {   
+                    // For [0]["git1"]
+                    var score = datasheet[group[i]]['git' + group[j]];
+                    // For [0][1]
+                    // var score = datasheet[group[i]][group[j]];
+                    member_score = score + member_score;
+                }
+            }
+            _total_score = member_score + _total_score;
+            
+        }
+        return _total_score;
+    }
 }
 
+// Find All basic combination based on specific group_size
+function chooseMember(arr, member_num) {
+    var allResult = [];
+    // var arr = [...Array(user_num).keys()];
 
-const group = new GroupMatch(data, 4);
-console.log("One of the Solution: " + group.match_group);
-const best_match = group.best_match;
-console.log("Best Match: " + best_match + ", Score is: " + group.total_score);
+    (function recursion(arr, member_num, result) {
+        var arrLen = arr.length;
+        if (member_num > arrLen) {
+            return;
+        }
+        if (member_num === arrLen) {
+            allResult.push([].concat(result, arr))
+        } else {
+            for (var i = 0; i < arrLen; i++) {
+                var newResult = [].concat(result);
+                newResult.push(arr[i]);
 
+                if (member_num === 1) {
+                    allResult.push(newResult);
+                } else {
+                    var newArr = [].concat(arr);
+                    newArr.splice(0, i + 1);
+                    recursion(newArr, member_num - 1, newResult);
+                }
+            }
+        }
+    })(arr, member_num, []);
 
-// export default GroupMatch;
+    return allResult;
+}
+
+export default GroupMatch;
