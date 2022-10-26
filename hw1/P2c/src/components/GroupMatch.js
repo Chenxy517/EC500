@@ -1,7 +1,7 @@
 class GroupMatch{
 
     // Privates should start with #. They are only accessible from inside the class.
-    #_groupOfMatch = [[]];
+    #_groupOfMatch = [];
     #_totalScore = 0;
     #_best_match = [];
  
@@ -10,25 +10,7 @@ class GroupMatch{
     {   
         // Define public variables that could be accessed by each member function: 
         this.table = score_table;
-        this.group_number = group_num;
-        try {
-            if (!score_table)
-            {
-                throw "Table is empty";
-            }
-            if (group_num < 2){
-                throw "Group size cannot smaller than 2";
-            }
-            if (group_num > score_table.length){
-                throw "Invalid Group size, Please try again.";
-            }          
-        }
-        catch(err) {
-            // DEBUG:
-            throw new Error(err);
-            // window.Error(err);
-        }
-
+        this.group_number = group_num;        
     }
 
     remove(element, array)
@@ -40,58 +22,6 @@ class GroupMatch{
             }
         }
         return array;
-    }
-
-    get match_group()
-    {   
-        // User has not been assigned for a specific group.
-        var unmatched = [...Array(this.table.length).keys()];
-        // Given a random USER, and pair the group members for this USER
-        var user = Math.floor(Math.random() * this.table.length);
-
-        var initial = true;
-
-        do 
-        {   // Define A Group for this USER:
-            var user_group = new Array();
-
-            if (initial) // Initialize, select the group for a random User:
-            {   
-                user_group.push(user);
-                unmatched = this.remove(user, unmatched);
-                this.get_member(user, user_group, unmatched);
-                initial = false;
-            }
-            else // Select the group for the residual USER only, which is grouped by nobody else.
-            {   
-                user = unmatched[0];
-                user_group.push(user);
-                unmatched = this.remove(user, unmatched);
-                this.get_member(user, user_group, unmatched);
-            }
-                
-        }
-        // If there is still USER not matched with any group, or he is the only one GUY that has been not selected by anybody else.
-        while(unmatched.length > 1)
-       
-        return this.#_groupOfMatch;
-    }
-
-    get_member(current_user, current_user_group, unmatched_user)
-    {   
-        // Keep looking for teammates for the current user, until reach the maximum size of the group.
-        while (current_user_group.length < this.group_number) {
-            // The best approached User(index) of the current user', given by the local MAXIMUM score of the user provided.
-            var best_user = this.table[current_user].indexOf(Math.max(...this.table[current_user]), 0);
-            current_user_group.push(best_user);
-        
-            unmatched_user = this.remove(best_user, unmatched_user);
-            
-            // For simple match a group member only by using Greedy, no tricky.
-            current_user = best_user;
-        }
-
-        this.#_groupOfMatch.push(current_user_group);
     }
 
     get total_score()
@@ -114,9 +44,9 @@ class GroupMatch{
         // Else: 
         // the numbers of the residual member in the unmatched, 
         // which is lesser than the group_size, We force make them a team.
-
+     
         this.#_best_match.push(unmatched);
-
+    
         return this.#_best_match;
     }
 
@@ -145,11 +75,14 @@ class GroupMatch{
                 // Update the current score
                 best_group = all_group[i];
             }
-
         }
+
+        
         // Push the current best matched group into the global combination for showing later.
         this.#_best_match.push(best_group);
-        // 
+        
+        this.#_totalScore = group_score + this.#_totalScore;
+
         for (var j=0; j < best_group.length; j++)
         {
             unmatched_member = this.remove(best_group[j], unmatched_member);
@@ -168,7 +101,7 @@ class GroupMatch{
             var this_member = group[i];
             for (let j=0; j < group.length; j++)
             {   
-                if (group[j] != this_member)
+                if (group[j] !== this_member)
                 {   
                     var score = datasheet[group[i]]['git' + group[j]];
                     member_score = score + member_score;
@@ -181,34 +114,48 @@ class GroupMatch{
     }
 }
 
+/**
+ * Find All possible combination based on specific group_size by using Recursion.
+ * and @returns: the all the combination based on the given Array() of Unmatched members.
+ * @param arr_unmatched: The array of the residual unmatched team member.
+ * @param all_combination: The maximum group size of each group
+ */
 // Find All basic combination based on specific group_size
-function chooseMember(arr, member_num) {
-    var allResult = [];
+function chooseMember(arr_unmatched, member_num) {
+    var all_combination = [];
 
-    (function recursion(arr, member_num, result) {
-        var arrLen = arr.length;
-        if (member_num > arrLen) {
+    (function recursive(arr_unmatched, member_num, result) 
+    {
+        if (member_num > arr_unmatched.length) 
+        {
             return;
         }
-        if (member_num === arrLen) {
-            allResult.push([].concat(result, arr))
-        } else {
-            for (var i = 0; i < arrLen; i++) {
+        if (member_num === arr_unmatched.length) 
+        {
+            all_combination.push([].concat(result, arr_unmatched))
+        } 
+        else 
+        {
+            for (var i = 0; i < arr_unmatched.length; i++) 
+            {
                 var newResult = [].concat(result);
-                newResult.push(arr[i]);
+                newResult.push(arr_unmatched[i]);
 
-                if (member_num === 1) {
-                    allResult.push(newResult);
-                } else {
-                    var newArr = [].concat(arr);
+                if (member_num === 1) 
+                {
+                    all_combination.push(newResult);
+                } 
+                else 
+                {
+                    var newArr = [].concat(arr_unmatched);
                     newArr.splice(0, i + 1);
-                    recursion(newArr, member_num - 1, newResult);
+                    recursive(newArr, member_num - 1, newResult);
                 }
             }
         }
-    })(arr, member_num, []);
+    })(arr_unmatched, member_num, []);
 
-    return allResult;
+    return all_combination;
 }
 
 export default GroupMatch;

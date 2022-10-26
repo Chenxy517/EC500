@@ -7,6 +7,7 @@ import { REDIS_URL, SALT, PASSWORD } from "../constants";
 
 function Grouping (props) {
     const { user_num, member_num } = props;
+    const [ total_score, setTotalScore ] = useState(0);
 
     const data = [];
     for (let i = 0; i < user_num; i++) {
@@ -48,19 +49,35 @@ function Grouping (props) {
         console.log(data);
         console.log("grouping start");
         const group_match = new GroupMatch(data, member_num);
-        const best_match = group_match.best_match;
-        console.log(best_match);
+    
+        console.log('Return value: ------' + group_match);
+        if (member_num < 2) 
+        {  
+            message.error("Group size cannot smaller than 2");
+        } 
+        else if (member_num > data.length)
+        {   
+            message.error("Invalid Group size, Please try again.");
+        }
+        else
+        {
+            const best_match = group_match.best_match;
+            setTotalScore(group_match.total_score);
+            console.log(best_match);
 
-        let display = "";
-        for (let i = 0; i < best_match.length; i++) {
-            display += '<br/>Group' + i + ': ';
-            for (let j = 0; j < best_match[i].length; j++) {
-                console.log(best_match[i][j]);
-                display += 'Git' + best_match[i][j] + '.  ';
-            }
-        };
-        console.log(display);
-        document.getElementById("display").innerHTML = display;
+            let display = "";
+            for (let i = 0; i < best_match.length; i++) {
+                if (best_match[i].length !== 0) {
+                    display += '<br/>Group' + i + ': ';
+                    for (let j = 0; j < best_match[i].length; j++) {
+                        console.log(best_match[i][j]);
+                        display += 'Git' + best_match[i][j] + '.  ';
+                    }
+                }
+            };
+            console.log(display);
+            document.getElementById("display").innerHTML = display;
+        }
     }
 
     return (
@@ -74,6 +91,9 @@ function Grouping (props) {
             </div>
             <div className="return-box">
                 Grouping Result:
+                <div>
+                    Total Score: {total_score}
+                </div>
                 <div 
                     id="display"
                     className="display">
