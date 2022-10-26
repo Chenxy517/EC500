@@ -6,7 +6,7 @@ import GroupMatch from './GroupMatch';
 import { REDIS_URL, SALT, PASSWORD } from "../constants";
 
 function Grouping (props) {
-    const { user_num, member_num, max_rank, max_sum } = props;
+    const { user_num, member_num } = props;
 
     const data = [];
     for (let i = 0; i < user_num; i++) {

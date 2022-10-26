@@ -169,10 +169,7 @@ class GroupMatch{
             {   
                 if (group[j] != this_member)
                 {   
-                    // For [0]["git1"]
                     var score = datasheet[group[i]]['git' + group[j]];
-                    // For [0][1]
-                    // var score = datasheet[group[i]][group[j]];
                     member_score = score + member_score;
                 }
             }
@@ -186,7 +183,6 @@ class GroupMatch{
 // Find All basic combination based on specific group_size
 function chooseMember(arr, member_num) {
     var allResult = [];
-    // var arr = [...Array(user_num).keys()];
 
     (function recursion(arr, member_num, result) {
         var arrLen = arr.length;

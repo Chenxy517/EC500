@@ -3,15 +3,13 @@ import {InputNumber} from 'antd'
 import { useNavigate } from "react-router-dom"
 
 function ParamBox (props) {
-    const { handleUserNum, handleMemberNum, handleMaxRank, handleMaxSum} = props;
+    const { handleUserNum, handleMemberNum } = props;
 
     let navigate = useNavigate();
 
     const submitParam = () => {
         handleUserNum(parseInt(document.getElementById("user_num").value));
         handleMemberNum(parseInt(document.getElementById("member_num").value));
-        handleMaxRank(parseInt(document.getElementById("max_rank").value));
-        handleMaxSum(parseInt(document.getElementById("max_sum").value));
         navigate('/input');
     }
 
@@ -30,26 +28,8 @@ function ParamBox (props) {
                 <InputNumber
                     defaultValue={0}
                     controls={false}
-                    addonBefore="Member Number"
+                    addonBefore="Group Size"
                     id="member_num"
-                    className="number_input"
-                />
-            </div>
-            <div className="input-boxes">
-                <InputNumber
-                    defaultValue={0}
-                    controls={false}
-                    addonBefore="Maximum Rank"
-                    id="max_rank"
-                    className="number_input"
-                />
-            </div>
-            <div className="input-boxes">
-                <InputNumber
-                    defaultValue={0}
-                    controls={false}
-                    addonBefore="Maximum Sum"
-                    id="max_sum"
                     className="number_input"
                 />
             </div>
